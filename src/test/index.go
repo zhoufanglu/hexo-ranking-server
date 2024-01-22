@@ -2,10 +2,11 @@ package test
 
 import "fmt"
 
-func sum(a, b int) int {
+func Sum(a, b int) int {
+	fmt.Print("ssssssss")
 	return a + b
 }
 
 func test() {
-	fmt.Println(sum(1, 2))
+	fmt.Println(Sum(1, 2))
 }

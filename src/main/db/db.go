@@ -14,7 +14,7 @@ func ConnectMysql() {
 
 	//? 连接数据库
 	var err error
-	dsn := "root:199517@tcp(127.0.0.1:3306)/hexo-ranking?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:199517@tcp(127.0.0.1:3306)/hero-ranking?charset=utf8mb4&parseTime=True&loc=Local"
 	Db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	fmt.Println("mysql数据库连接成功~")
 	if err != nil {

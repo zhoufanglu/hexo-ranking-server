@@ -1,4 +1,4 @@
-package user
+package users
 
 import (
 	"fmt"
@@ -32,7 +32,7 @@ func InsertUser(c *gin.Context) {
 		return
 	}
 	// ?判断名字有没有重复
-	users := selectUserBySql()
+	users := SelectUserBySql()
 	if containsName(users, userRequest.Name) {
 		c.JSON(http.StatusOK, gin.H{
 			"code":    500,
@@ -61,7 +61,7 @@ func InsertUser(c *gin.Context) {
 func GetUsers(c *gin.Context) {
 	// 查询数据库
 	var users []Users
-	users = selectUserBySql()
+	users = SelectUserBySql()
 
 	// 返回用户信息
 	c.JSON(http.StatusOK, gin.H{
@@ -79,6 +79,7 @@ func DeleteUser(c *gin.Context) {
 	}
 
 	db.Db.Exec(fmt.Sprintf("delete from Users where id='%s'", userRequest.Id))
+	db.Db.Exec(fmt.Sprintf("DELETE FROM Records WHERE user_id='%s'", userRequest.Id))
 
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
@@ -86,10 +87,9 @@ func DeleteUser(c *gin.Context) {
 	})
 }
 
-func selectUserBySql() []Users {
+func SelectUserBySql() []Users {
 	var users []Users
-	if err := db.Db.Find(&users).Error; err != nil {
-		// return users
+	if err := db.Db.Order("create_at ASC").Find(&users).Error; err != nil {
 		fmt.Println("Error querying Users table:", err)
 	}
 	return users

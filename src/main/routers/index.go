@@ -2,7 +2,8 @@ package routers
 
 import (
 	"fmt"
-	"fuck-go/src/main/routers/user"
+	"fuck-go/src/main/routers/records"
+	"fuck-go/src/main/routers/users"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -15,16 +16,23 @@ func CreateRouter() {
 	// gin.Context，封装了request和response
 	// 允许使用跨域请求  全局中间件
 	r.Use(cors())
-	loadRoute(r)
+	// 设置路由组（统一前缀地址）
+	apiGroup := r.Group("/hero-ranking")
+	loadRoute(apiGroup)
 	// 3.监听端口，默认在8080
 	// Run("里面不指定端口号默认为8080")
 	r.Run(":8888")
 }
 
-func loadRoute(r *gin.Engine) {
-	r.POST("/user/insert", user.InsertUser)
-	r.GET("/user/list", user.GetUsers)
-	r.POST("/user/delete", user.DeleteUser)
+func loadRoute(apiGroup *gin.RouterGroup) {
+	// ?Users
+	apiGroup.POST("/user/insert", users.InsertUser)
+	apiGroup.GET("/user/list", users.GetUsers)
+	apiGroup.POST("/user/delete", users.DeleteUser)
+	// ?Records
+	apiGroup.GET("/record/list", records.GetRecords)
+	apiGroup.POST("/record/insert", records.InsertRecord)
+	apiGroup.POST("/record/delete", records.DeleteRecord)
 }
 
 // ?跨域
