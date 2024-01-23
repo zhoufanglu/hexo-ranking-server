@@ -21,50 +21,84 @@ type requestInsertType struct {
 	CreateAt string `json:"createAt"`
 }
 
+// 数据库返回的类型
 type UserDateListType struct {
-	Id       string   `json:"userId"`
-	Name     string   `json:"name"`
-	Dates    string   `json:"dates"`
-	DateList []string `json:"dateList"`
+	UserId    string `gorm:"column:userId" json:"userId"`
+	Name      string `json:"name"`
+	Dates     string `json:"dates"`
+	RecordIds string `gorm:"column:recordIds" json:"recordIds"`
+}
+
+// 定义Records结构体
+type Record struct {
+	Date string `json:"date"`
+	Id   string `json:"id"`
+}
+
+// 定义UserWithRecords结构体
+type UserWithRecords struct {
+	UserId  string   `json:"userId"`
+	Name    string   `json:"name"`
+	Records []Record `json:"records"`
 }
 
 func GetRecords(c *gin.Context) {
 	// ?获取入参
 	createAt := c.Query("createAt")
-	fmt.Print(30, createAt)
 
 	var records []UserDateListType
 	// Execute the SQL query
 	result := db.Db.Raw(`
 		SELECT
-			U.id,
+			U.id AS userId,
 			U.name,
-			GROUP_CONCAT(DATE_FORMAT(R.create_at, '%Y-%m-%d')) AS dates
+			GROUP_CONCAT(DATE_FORMAT(R.create_at, '%Y-%m-%d')) AS dates,
+			GROUP_CONCAT(R.id) AS recordIds
 		FROM
 			Users U
 		LEFT JOIN
-			Records R ON U.id = R.user_id AND DATE_FORMAT(R.create_at, '%Y-%m') = '2024-01'
+			Records R ON U.id = R.user_id AND DATE_FORMAT(R.create_at, '%Y-%m') = ?
 		GROUP BY
 			U.id, U.name
 		ORDER BY
     		U.create_at ASC;
-	`).Scan(&records)
-
+	`, createAt).Scan(&records)
+	fmt.Println(records)
 	// Check for errors
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
 
-	// 转换日期字符串为数组
-	for i := range records {
-		records[i].DateList = strings.Split(records[i].Dates, ",")
+	// 构建返回数据
+	var responseData []UserWithRecords
+
+	for _, record := range records {
+		// 将Dates和RecordIds分割为数组
+		dateList := strings.Split(record.Dates, ",")
+		recordIdList := strings.Split(record.RecordIds, ",")
+
+		// 构建UserWithRecords对象
+		userWithRecords := UserWithRecords{
+			UserId:  record.UserId,
+			Name:    record.Name,
+			Records: make([]Record, len(dateList)),
+		}
+		// 填充Records数组
+		for i, date := range dateList {
+			userWithRecords.Records[i] = Record{
+				Date: date,
+				Id:   recordIdList[i],
+			}
+		}
+		// 添加到responseData
+		responseData = append(responseData, userWithRecords)
 	}
 
 	// 返回信息
 	c.JSON(http.StatusOK, gin.H{
 		"code": http.StatusOK,
-		"data": records,
+		"data": responseData,
 	})
 }
 
