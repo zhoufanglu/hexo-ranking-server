@@ -2,6 +2,8 @@ package routers
 
 import (
 	"fmt"
+	"fuck-go/src/main/FSNotify"
+	"fuck-go/src/main/Websocket"
 	"fuck-go/src/main/routers/records"
 	"fuck-go/src/main/routers/users"
 	"github.com/gin-gonic/gin"
@@ -21,6 +23,8 @@ func CreateRouter() {
 	loadRoute(apiGroup)
 	// 3.监听端口，默认在8080
 	// Run("里面不指定端口号默认为8080")
+	go watchFile()
+
 	r.Run(":8888")
 }
 
@@ -33,6 +37,59 @@ func loadRoute(apiGroup *gin.RouterGroup) {
 	apiGroup.GET("/record/list", records.GetRecords)
 	apiGroup.POST("/record/insert", records.InsertRecord)
 	apiGroup.POST("/record/delete", records.DeleteRecord)
+	// ?websocket
+	apiGroup.GET("/ws", func(c *gin.Context) {
+		Websocket.Connect(c)
+	})
+}
+
+func watchFile() {
+	watch := FSNotify.NewNotifyFile()
+	watch.WatchDir("/Users/lufangzhou/Documents/work-space/personal/hero-ranking/dist")
+	select {}
+	/*
+		// 指定要监视的目录
+		directoryToWatch := "/Users/lufangzhou/Documents/work-space/ep/数据支撑/质量平台/trimps-frontend-dim/dist"
+		// 创建 fsnotify 监视器
+		watcher, err := fsnotify.NewWatcher()
+		if err != nil {
+			fmt.Println("Error creating watcher:", err)
+			return
+		}
+		defer watcher.Close()
+
+		// 将目录添加到监视器中
+		err = filepath.Walk(directoryToWatch, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			return watcher.Add(path)
+		})
+		if err != nil {
+			fmt.Println("Error adding directory to watcher:", err)
+			return
+		}
+
+		// 启动 goroutine 处理文件变化事件
+		go func() {
+			fmt.Println("aaaa")
+			for {
+				select {
+				case event, ok := <-watcher.Events:
+					if !ok {
+						return
+					}
+					if event.Op&fsnotify.Write == fsnotify.Write {
+						fmt.Println("File modified:", event.Name)
+					}
+				case err, ok := <-watcher.Errors:
+					if !ok {
+						return
+					}
+					fmt.Println("Error:", err)
+				}
+			}
+		}()*/
 }
 
 // ?跨域
@@ -56,7 +113,6 @@ func cors() gin.HandlerFunc {
 			c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE,UPDATE") //服务器支持的所有跨域请求的方法,为了避免浏览次请求的多次'预检'请求
 			//  header的类型
 			c.Header("Access-Control-Allow-Headers", "Authorization, Content-Length, X-CSRF-Token, Token,session,X_Requested_With,Accept, Origin, Host, Connection, Accept-Encoding, Accept-Language,DNT, X-CustomHeader, Keep-Alive, User-Agent, X-Requested-With, If-Modified-Since, Cache-Control, Content-Type, Pragma")
-			//              允许跨域设置                                                                                                      可以返回其他子段
 			c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,Cache-Control,Content-Language,Content-Type,Expires,Last-Modified,Pragma,FooBar") // 跨域关键设置 让浏览器可以解析
 			c.Header("Access-Control-Max-Age", "172800")                                                                                                                                                           // 缓存请求信息 单位为秒
 			c.Header("Access-Control-Allow-Credentials", "false")                                                                                                                                                  //  跨域请求是否需要带cookie信息 默认设置为true

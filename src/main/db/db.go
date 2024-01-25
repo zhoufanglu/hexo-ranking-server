@@ -8,7 +8,7 @@ import (
 )
 
 // ? 全局变量
-var Db *gorm.DB // 在 main 函数外定义数据库连接
+var Db *gorm.DB
 
 func ConnectMysql() {
 
