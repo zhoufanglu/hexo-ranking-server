@@ -25,6 +25,7 @@ type requestInsertType struct {
 type UserDateListType struct {
 	UserId    string `gorm:"column:userId" json:"userId"`
 	Name      string `json:"name"`
+	Qq        string `json:"qq"`
 	Dates     string `json:"dates"`
 	RecordIds string `gorm:"column:recordIds" json:"recordIds"`
 }
@@ -39,6 +40,7 @@ type Record struct {
 type UserWithRecords struct {
 	UserId  string   `json:"userId"`
 	Name    string   `json:"name"`
+	Qq      string   `json:"qq"`
 	Records []Record `json:"records"`
 }
 
@@ -52,6 +54,7 @@ func GetRecords(c *gin.Context) {
 		SELECT
 			U.id AS userId,
 			U.name,
+			U.qq,
 			GROUP_CONCAT(DATE_FORMAT(R.create_at, '%Y-%m-%d')) AS dates,
 			GROUP_CONCAT(R.id) AS recordIds
 		FROM
@@ -63,7 +66,7 @@ func GetRecords(c *gin.Context) {
 		ORDER BY
     		U.create_at ASC;
 	`, createAt).Scan(&records)
-	fmt.Println(records)
+	fmt.Println(68, records)
 	// Check for errors
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
@@ -82,6 +85,7 @@ func GetRecords(c *gin.Context) {
 		userWithRecords := UserWithRecords{
 			UserId:  record.UserId,
 			Name:    record.Name,
+			Qq:      record.Qq,
 			Records: make([]Record, len(dateList)),
 		}
 		// 填充Records数组

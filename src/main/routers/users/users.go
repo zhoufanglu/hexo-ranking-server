@@ -13,11 +13,13 @@ import (
 type Users struct {
 	Id       string `gorm:"column:id" json:"id"`
 	Name     string `gorm:"column:name" json:"name"`
+	Qq       string `gorm:"column:qq" json:"qq"`
 	CreateAt string `gorm:"column:create_at" json:"createAt"`
 }
 
 type requestInsertType struct {
 	Name string `json:"name"`
+	Qq   string `json:"qq"`
 }
 
 type requestDeleteType struct {
@@ -40,11 +42,13 @@ func InsertUser(c *gin.Context) {
 		})
 		return
 	}
+
 	// ?拼接 插入
 	var user Users
 	user.CreateAt = time.Now().Format("2006-01-02 15:04:05")
 	user.Id = uuid.New().String()
 	user.Name = userRequest.Name
+	user.Qq = userRequest.Qq
 
 	// 使用 GORM 创建记录
 	result := db.Db.Create(&user)

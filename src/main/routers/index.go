@@ -7,9 +7,16 @@ import (
 	"fuck-go/src/main/routers/records"
 	"fuck-go/src/main/routers/users"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"net/http"
 	"strings"
 )
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
 func CreateRouter() {
 	// 1.创建路由
