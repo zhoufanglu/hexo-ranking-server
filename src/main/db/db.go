@@ -14,6 +14,7 @@ func ConnectMysql() {
 
 	//? 连接数据库
 	var err error
+	// 服务器地址为 124.221.125.121:3306
 	dsn := "root:199517@tcp(127.0.0.1:3306)/hero-ranking?charset=utf8mb4&parseTime=True&loc=Local"
 	Db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
