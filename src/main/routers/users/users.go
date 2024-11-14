@@ -15,6 +15,7 @@ type Users struct {
 	Name     string `gorm:"column:name" json:"name"`
 	Qq       string `gorm:"column:qq" json:"qq"`
 	CreateAt string `gorm:"column:create_at" json:"createAt"`
+	IsAdmin  int    `gorm:"column:isAdmin" json:"isAdmin"`
 }
 
 type requestInsertType struct {
@@ -24,6 +25,10 @@ type requestInsertType struct {
 
 type requestDeleteType struct {
 	Id string `json:"id"`
+}
+
+type requestLoginType struct {
+	Qq string `json:"qq"`
 }
 
 func InsertUser(c *gin.Context) {
@@ -97,6 +102,34 @@ func SelectUserBySql() []Users {
 		fmt.Println("Error querying Users table:", err)
 	}
 	return users
+}
+
+// LoginUser 登录接口
+func LoginUser(c *gin.Context) {
+	// ?获取入参
+	var loginRequest requestLoginType
+	if err := c.ShouldBindJSON(&loginRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 根据 QQ 查找用户
+	var user Users
+	result := db.Db.Where("qq = ?", loginRequest.Qq).First(&user)
+	if result.Error != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code":    404,
+			"message": "登录失败，用户不存在",
+		})
+		return
+	}
+
+	// 登录成功
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "登录成功",
+		"data":    user,
+	})
 }
 
 // 判断 name 是否存在于 Users 结构体切片中

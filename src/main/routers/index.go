@@ -39,6 +39,7 @@ func loadRoute(apiGroup *gin.RouterGroup) {
 	apiGroup.POST("/user/insert", users.InsertUser)
 	apiGroup.GET("/user/list", users.GetUsers)
 	apiGroup.POST("/user/delete", users.DeleteUser)
+	apiGroup.POST("/user/login", users.LoginUser)
 	// ?Records
 	apiGroup.GET("/record/list", records.GetRecords)
 	apiGroup.POST("/record/insert", records.InsertRecord)
