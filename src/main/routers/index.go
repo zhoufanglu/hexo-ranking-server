@@ -2,7 +2,6 @@ package routers
 
 import (
 	"fmt"
-	"fuck-go/src/main/FSNotify"
 	"fuck-go/src/main/Websocket"
 	"fuck-go/src/main/routers/records"
 	"fuck-go/src/main/routers/users"
@@ -30,7 +29,7 @@ func CreateRouter() {
 	loadRoute(apiGroup)
 	// 3.监听端口，默认在8080
 	// Run("里面不指定端口号默认为8080")
-	go watchFile()
+	// go watchFile()
 
 	r.Run(":8888")
 }
@@ -51,9 +50,9 @@ func loadRoute(apiGroup *gin.RouterGroup) {
 }
 
 func watchFile() {
-	watch := FSNotify.NewNotifyFile()
+	/*watch := FSNotify.NewNotifyFile()
 	watch.WatchDir("/Users/lufangzhou/Documents/work-space/personal/hero-ranking/dist")
-	select {}
+	select {}*/
 	/*
 		// 指定要监视的目录
 		directoryToWatch := "/Users/lufangzhou/Documents/work-space/ep/数据支撑/质量平台/trimps-frontend-dim/dist"
