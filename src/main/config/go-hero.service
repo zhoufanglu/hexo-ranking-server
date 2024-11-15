@@ -1,0 +1,12 @@
+[Unit]
+Description=Hero Ranking Server
+After=network.target
+
+[Service]
+ExecStart=/u01/hero-ranking-server/hero-ranking-server
+WorkingDirectory=/u01/hero-ranking-server
+Restart=always
+Environment=GIN_MODE=release
+
+[Install]
+WantedBy=multi-user.target
